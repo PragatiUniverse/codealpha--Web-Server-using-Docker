@@ -1,20 +1,24 @@
-# Use the official Node.js runtime as the base image
-FROM node:18-alpine
+# Use Python 3.11 slim image for smaller size
+FROM python:3.11-slim
 
-# Set the working directory inside the container
+# Set environment variables
+ENV FLASK_ENV=production
+ENV PYTHONUNBUFFERED=1
+
+# Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json (if available)
-COPY package*.json ./
+# Copy requirements first for better caching
+COPY requirements.txt .
 
 # Install dependencies
-RUN npm install
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application code
-COPY . .
+# Copy application code
+COPY app.py .
 
-# Expose the port the app runs on
-EXPOSE 3000
+# Expose port
+EXPOSE 5000
 
-# Define the command to run the app
-CMD ["npm", "start"]
+# Run the application
+CMD ["python", "app.py"]
